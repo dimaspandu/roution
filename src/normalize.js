@@ -28,6 +28,50 @@ export function normalizePathname(input) {
 }
 
 /**
+ * Parse the query string of an incoming pathname into an object.
+ *
+ * The leading "?" is optional. Values are kept as strings (standard HTTP
+ * semantics). When a key appears more than once, its values are collected
+ * into an array. URL encoding is decoded automatically. If there is no query
+ * string, an empty object is returned. The URL fragment is ignored.
+ *
+ * @param {unknown} input - The incoming pathname or URL.
+ * @returns {Object<string, string | string[]>} The parsed query parameters.
+ */
+export function parseQuery(input) {
+  if (input == null) {
+    return {};
+  }
+
+  let path = String(input);
+
+  const hashIndex = path.indexOf("#");
+  if (hashIndex !== -1) {
+    path = path.slice(0, hashIndex);
+  }
+
+  const queryIndex = path.indexOf("?");
+  if (queryIndex === -1) {
+    return {};
+  }
+
+  const queryString = path.slice(queryIndex + 1);
+  if (queryString === "") {
+    return {};
+  }
+
+  const params = new URLSearchParams(queryString);
+  const result = {};
+
+  for (const key of new Set(params.keys())) {
+    const values = params.getAll(key);
+    result[key] = values.length > 1 ? values : values[0];
+  }
+
+  return result;
+}
+
+/**
  * Split a pathname into its non-empty segments.
  *
  * Leading and trailing slashes are ignored, so "/a/b/c/" yields ["a", "b", "c"]

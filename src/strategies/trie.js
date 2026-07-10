@@ -1,4 +1,4 @@
-import { normalizePathname, splitSegments } from "../normalize.js";
+import { normalizePathname, splitSegments, parseQuery } from "../normalize.js";
 import { parsePattern } from "../pattern.js";
 
 /**
@@ -132,6 +132,7 @@ export function createTrieStrategy(compiled) {
   return {
     match(pathname) {
       const normalized = normalizePathname(pathname);
+      const query = parseQuery(pathname);
       const segments = splitSegments(normalized);
 
       const matched = matchTrie(root, segments);
@@ -141,6 +142,7 @@ export function createTrieStrategy(compiled) {
           pathname: normalized,
           route: matched.terminal.route,
           params: matched.params,
+          query,
           value: matched.terminal.value,
         };
       }
@@ -151,6 +153,7 @@ export function createTrieStrategy(compiled) {
           pathname: normalized,
           route: root.wildcard.route,
           params: {},
+          query,
           value: root.wildcard.value,
         };
       }
@@ -160,6 +163,7 @@ export function createTrieStrategy(compiled) {
         pathname: normalized,
         route: null,
         params: {},
+        query,
         value: null,
       };
     },

@@ -30,6 +30,7 @@ test("reproduces the README quick start example", () => {
     pathname: "/articles/javascript",
     route: "/articles/:slug",
     params: { slug: "javascript" },
+    query: { page: "1" },
     value: "public/articles/[slug].html",
   });
 });

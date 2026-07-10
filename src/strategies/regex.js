@@ -1,4 +1,4 @@
-import { normalizePathname, splitSegments } from "../normalize.js";
+import { normalizePathname, splitSegments, parseQuery } from "../normalize.js";
 
 /**
  * Build a regular expression for a single dynamic route.
@@ -46,6 +46,7 @@ export function createRegexStrategy(compiled) {
   return {
     match(pathname) {
       const normalized = normalizePathname(pathname);
+      const query = parseQuery(pathname);
 
       const staticHit = compiled.staticRoutes.get(normalized);
       if (staticHit) {
@@ -54,6 +55,7 @@ export function createRegexStrategy(compiled) {
           pathname: normalized,
           route: staticHit.route,
           params: {},
+          query,
           value: staticHit.value,
         };
       }
@@ -73,6 +75,7 @@ export function createRegexStrategy(compiled) {
             pathname: normalized,
             route: entry.route,
             params,
+            query,
             value: entry.value,
           };
         }
@@ -84,6 +87,7 @@ export function createRegexStrategy(compiled) {
           pathname: normalized,
           route: compiled.wildcard.route,
           params: {},
+          query,
           value: compiled.wildcard.value,
         };
       }
@@ -93,6 +97,7 @@ export function createRegexStrategy(compiled) {
         pathname: normalized,
         route: null,
         params: {},
+        query,
         value: null,
       };
     },

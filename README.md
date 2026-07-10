@@ -137,6 +137,9 @@ Returns:
   params: {
     slug: "javascript"
   },
+  query: {
+    page: "1"
+  },
   value: "public/articles/[slug].html"
 }
 ```
@@ -361,19 +364,59 @@ A successful match returns a structured object.
   params: {
     slug: "javascript"
   },
+  query: {
+    page: "1"
+  },
   value: "public/articles/[slug].html"
 }
 ```
 
-| Property   | Description                                  |
-| ---------- | -------------------------------------------- |
-| `found`    | Whether a route was matched                  |
-| `pathname` | The normalized pathname                      |
-| `route`    | The matching route definition                |
-| `params`   | Extracted route parameters                   |
-| `value`    | The original value associated with the route |
+| Property   | Description                                         |
+| ---------- | --------------------------------------------------- |
+| `found`    | Whether a route was matched                         |
+| `pathname` | The normalized pathname                             |
+| `route`    | The matching route definition                       |
+| `params`   | Extracted route parameters                          |
+| `query`    | Parsed query string parameters                      |
+| `value`    | The original value associated with the route        |
 
 If no route matches, `found` is `false`.
+
+## Query Parameters
+
+In addition to `pathname` normalization, ROUTION parses the query string and
+exposes it as the `query` property of the matching result.
+
+Query values follow standard HTTP semantics:
+
+* Values are kept as strings.
+* A key that appears more than once is collected into an array.
+* URL encoding is decoded automatically.
+* The URL fragment is ignored.
+
+Example:
+
+```javascript
+matcher.match("/search?q=hello%20world&tag=a&tag=b");
+```
+
+Returns:
+
+```javascript
+{
+  found: true,
+  pathname: "/search",
+  route: "/search",
+  params: {},
+  query: {
+    q: "hello world",
+    tag: ["a", "b"]
+  },
+  value: "public/search.html"
+}
+```
+
+When there is no query string, `query` is an empty object.
 
 ## Matching Strategy
 

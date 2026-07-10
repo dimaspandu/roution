@@ -13,6 +13,7 @@ import { parsePattern } from "./pattern.js";
  * @property {string} pathname - The normalized pathname that was matched against.
  * @property {string | null} route - The matched route pattern, or null when not found.
  * @property {Object<string, string>} params - Extracted route parameters.
+ * @property {Object<string, string | string[]>} query - Parsed query string parameters.
  * @property {any} value - The opaque value associated with the matched route.
  */
 

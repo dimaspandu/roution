@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-07-10
+
+### Added
+
+- `query` field in the matching result. The query string is now parsed and
+  exposed as `query` using standard HTTP semantics: values are strings, repeated
+  keys become arrays, URL encoding is decoded, and the URL fragment is ignored.
+  When there is no query string, `query` is an empty object.
+
 ## [1.0.0] - 2026-07-10
 
 ### Added

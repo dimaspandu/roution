@@ -78,6 +78,25 @@ for (const [name, strategyFactory] of [
     assert.equal(result.pathname, "/articles/javascript");
   });
 
+  test(`[${name}] parses query into the result`, () => {
+    const [strategy] = buildStrategies({ "/articles/:slug": "page" });
+    const result = strategy.match("/articles/javascript?page=1&perPage=10");
+    assert.deepEqual(result.query, { page: "1", perPage: "10" });
+    assert.deepEqual(result.params, { slug: "javascript" });
+  });
+
+  test(`[${name}] returns empty query when none present`, () => {
+    const [strategy] = buildStrategies({ "/about": "about" });
+    const result = strategy.match("/about");
+    assert.deepEqual(result.query, {});
+  });
+
+  test(`[${name}] collects repeated query keys into an array`, () => {
+    const [strategy] = buildStrategies({ "/search": "s" });
+    const result = strategy.match("/search?tag=a&tag=b");
+    assert.deepEqual(result.query, { tag: ["a", "b"] });
+  });
+
   test(`[${name}] normalizes fragment before matching`, () => {
     const [strategy] = buildStrategies({ "/articles": "page" });
     const result = strategy.match("/articles#section");

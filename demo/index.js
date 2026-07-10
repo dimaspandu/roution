@@ -66,6 +66,7 @@ for (const pathname of samples) {
   console.log(`  route:    ${result.route}`);
   console.log(`  pathname: ${result.pathname}`);
   console.log(`  params:   ${JSON.stringify(result.params)}`);
+  console.log(`  query:    ${JSON.stringify(result.query)}`);
   console.log(`  value:    ${formatValue(result.value)}`);
   console.log("");
 }
