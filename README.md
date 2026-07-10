@@ -440,6 +440,25 @@ Compilation happens only once.
 
 The resulting matcher can be reused throughout the lifetime of the application.
 
+### `createMatcher(routes, options)`
+
+`createMatcher()` accepts an optional second argument to tune behavior. All
+options are optional and have safe defaults, so existing usage is unchanged.
+
+```javascript
+const matcher = createMatcher(routes, {
+  query: true,          // include the parsed query in the result (default: true)
+  strategy: "auto",     // "auto" (default) | "regex" | "trie"
+  dynamicThreshold: 50  // dynamic route count at/above which "auto" selects trie
+});
+```
+
+| Option            | Type                            | Default | Description                                                                 |
+| ----------------- | ------------------------------- | ------- | --------------------------------------------------------------------------- |
+| `query`           | `boolean`                       | `true`  | When `true`, the result includes the parsed `query` object. When `false`, `query` is always `{}`. |
+| `strategy`        | `"auto" \| "regex" \| "trie"`   | `"auto"`| `"auto"` picks based on route count; `"regex"`/`"trie"` force a specific algorithm. |
+| `dynamicThreshold`| `number`                        | `50`    | Dynamic route count at or above which `"auto"` selects the trie strategy.  |
+
 ### `match()`
 
 Matches an incoming pathname.

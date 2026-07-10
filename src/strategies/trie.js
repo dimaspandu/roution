@@ -124,15 +124,16 @@ function matchTrie(root, segments) {
  * dynamic routes live in the same trie; an optional wildcard is the fallback.
  *
  * @param {import("../compile.js").CompiledRoutes} compiled - The compiled route collection.
+ * @param {boolean} [includeQuery] - When true, parse the query string into the result.
  * @returns {import("../compile.js").MatchStrategy} A strategy exposing a match method.
  */
-export function createTrieStrategy(compiled) {
+export function createTrieStrategy(compiled, includeQuery = true) {
   const root = buildTrie(compiled);
 
   return {
     match(pathname) {
       const normalized = normalizePathname(pathname);
-      const query = parseQuery(pathname);
+      const query = includeQuery ? parseQuery(pathname) : {};
       const segments = splitSegments(normalized);
 
       const matched = matchTrie(root, segments);

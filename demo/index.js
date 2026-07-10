@@ -37,6 +37,22 @@ const routes = {
 
 const matcher = createMatcher(routes);
 
+/*
+ * createMatcher accepts an optional second argument to tune behavior.
+ * All options are optional and fall back to safe defaults, so the call
+ * above behaves exactly like the 1.0.1 release.
+ *
+ *   // Disable query parsing: result.query is always {}.
+ *   createMatcher(routes, { query: false });
+ *
+ *   // Force a specific matching algorithm instead of "auto".
+ *   createMatcher(routes, { strategy: "regex" });
+ *   createMatcher(routes, { strategy: "trie" });
+ *
+ *   // Override when "auto" switches from regex to trie (default 50).
+ *   createMatcher(routes, { strategy: "auto", dynamicThreshold: 20 });
+ */
+
 const samples = [
   "/",
   "/about",

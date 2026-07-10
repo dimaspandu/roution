@@ -33,9 +33,10 @@ function buildRegex(route) {
  * expressions, and an optional wildcard is used as a fallback.
  *
  * @param {import("../compile.js").CompiledRoutes} compiled - The compiled route collection.
+ * @param {boolean} [includeQuery] - When true, parse the query string into the result.
  * @returns {import("../compile.js").MatchStrategy} A strategy exposing a match method.
  */
-export function createRegexStrategy(compiled) {
+export function createRegexStrategy(compiled, includeQuery = true) {
   const regexRoutes = compiled.dynamicRoutes.map((route) => ({
     regex: buildRegex(route),
     paramNames: route.paramNames,
@@ -46,7 +47,7 @@ export function createRegexStrategy(compiled) {
   return {
     match(pathname) {
       const normalized = normalizePathname(pathname);
-      const query = parseQuery(pathname);
+      const query = includeQuery ? parseQuery(pathname) : {};
 
       const staticHit = compiled.staticRoutes.get(normalized);
       if (staticHit) {

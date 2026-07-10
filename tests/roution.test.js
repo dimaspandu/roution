@@ -47,3 +47,29 @@ test("supports arbitrary opaque values", () => {
   const matcher = createMatcher({ "/fn": fn });
   assert.equal(matcher.match("/fn").value, fn);
 });
+
+test("options.query false omits query parsing", () => {
+  const matcher = createMatcher({ "/a": "v" }, { query: false });
+  assert.deepEqual(matcher.match("/a?x=1").query, {});
+});
+
+test("options.strategy regex forces the regex strategy", () => {
+  const matcher = createMatcher({ "/articles/:slug": "v" }, { strategy: "regex" });
+  const result = matcher.match("/articles/javascript?page=1");
+  assert.equal(result.route, "/articles/:slug");
+  assert.deepEqual(result.query, { page: "1" });
+});
+
+test("options.strategy trie forces the trie strategy", () => {
+  const matcher = createMatcher({ "/articles/:slug": "v" }, { strategy: "trie" });
+  const result = matcher.match("/articles/javascript?page=1");
+  assert.equal(result.route, "/articles/:slug");
+  assert.deepEqual(result.query, { page: "1" });
+});
+
+test("default options keep current behavior", () => {
+  const matcher = createMatcher({ "/articles/:slug": "v" });
+  const result = matcher.match("/articles/javascript?page=1");
+  assert.equal(result.route, "/articles/:slug");
+  assert.deepEqual(result.query, { page: "1" });
+});
