@@ -1,6 +1,6 @@
 # ROUTION
 
-A lightweight, runtime-independent route resolution engine for JavaScript.
+A lightweight, runtime-independent route resolution engine, available across multiple programming languages.
 
 ROUTION compiles route definitions into a reusable matcher that resolves incoming pathnames and returns structured matching results.
 
@@ -31,19 +31,39 @@ ROUTION provides a small, focused engine that compiles route definitions once an
 
 Compile once. Match many.
 
-The same matcher can be used in:
+The same matching behavior is shared across every language implementation, so the way routes are defined and resolved stays consistent whether you use JavaScript, Go, or another supported language.
 
-* Browser
-* Node.js
-* Bun
-* Deno
-* Cloudflare Workers
-* Service Workers
-* Edge runtimes
-* Test environments
-* Any JavaScript runtime supporting standard ECMAScript Modules (ESM)
+## Language Implementations
 
-ROUTION has zero runtime dependencies and makes no assumptions about where it runs.
+ROUTION is implemented per language, each as a self-contained module inside its own folder. The JavaScript implementation is the reference; other languages follow the same specification and matching behavior.
+
+| Language   | Path    | Status      | Notes                                                      |
+| ---------- | ------- | ----------- | ---------------------------------------------------------- |
+| JavaScript | `js/`   | Stable      | Reference implementation (ESM, zero dependencies).         |
+| Go         | `go/`   | In progress | `normalize` and `pattern` are implemented with tests.      |
+| PHP        | `php/`  | Planned     | Not started yet.                                           |
+
+Each language folder is independent: it ships its own source, tests, and (where applicable) examples, and has no dependency on the other folders.
+
+## Project Layout
+
+```text
+roution/
+  js/                 # JavaScript (ESM) reference implementation
+    src/              # engine source
+    tests/            # unit tests (node:test)
+    examples/         # runnable example
+    package.json
+  go/                 # Go implementation (in progress)
+    normalize.go      # pathname normalization + query parsing
+    pattern.go        # route pattern parsing
+    internal/         # matcher strategies (regex, trie) - in progress
+    examples/         # runnable example (in progress)
+    *_test.go         # unit tests
+  README.md
+  LICENSE
+  CHANGELOG.md
+```
 
 ## Philosophy
 
@@ -52,11 +72,12 @@ ROUTION follows a simple set of design principles.
 * Compile once. Match many.
 * Runtime independent.
 * Framework agnostic.
+* Language agnostic.
 * Single responsibility.
 * Zero runtime dependencies.
 * Unit-test friendly.
 
-The public API is intentionally small while remaining suitable for projects of any size.
+The public API of each implementation is intentionally small while remaining suitable for projects of any size.
 
 ## Features
 
@@ -64,39 +85,38 @@ The public API is intentionally small while remaining suitable for projects of a
 * Dynamic route parameters
 * Wildcard fallback routes
 * Automatic pathname normalization
-* Query strings are ignored
+* Query string parsing (standard HTTP semantics)
 * URL fragments are ignored
 * Compile once and reuse the matcher
 * Runtime independent
 * Framework agnostic
+* Language agnostic
 * Zero runtime dependencies
 * Predictable matching results
 * Supports arbitrary route values
 
 ## Installation
 
-ROUTION has zero runtime dependencies.
+Each implementation is dependency free. Import the module from the language folder directly into your application.
 
-Import the module directly into your application.
-
-### ES Module
+### JavaScript (ESM)
 
 ```javascript
-import { createMatcher } from "./roution.js";
+import { createMatcher } from "./js/src/roution.js";
 ```
 
 ### Browser
 
 ```html
 <script type="module">
-import { createMatcher } from "./roution.js";
+import { createMatcher } from "./js/src/roution.js";
 </script>
 ```
 
 ### Node.js
 
 ```javascript
-import { createMatcher } from "./roution.js";
+import { createMatcher } from "./js/src/roution.js";
 ```
 
 No package manager is required.
@@ -104,7 +124,7 @@ No package manager is required.
 ## Quick Start
 
 ```javascript
-import { createMatcher } from "./roution.js";
+import { createMatcher } from "./js/src/roution.js";
 
 const routes = {
   "/": "public/index.html",
@@ -146,24 +166,22 @@ Returns:
 
 ## Demo
 
-A runnable sample is available in the `demo/` folder. It defines a varied route
-collection (static, dynamic, multi-parameter, wildcard, arrays, objects,
-functions) and prints the matching result for several pathnames, including
-paths that fall through to the wildcard route.
+A runnable JavaScript sample is available in `js/examples/`. It defines a varied route collection (static, dynamic, multi-parameter, wildcard, arrays, objects, functions) and prints the matching result for several pathnames, including paths that fall through to the wildcard route.
 
 Run it with Node.js (no install step required):
 
 ```bash
-node demo/index.js
+node js/examples/index.js
 ```
 
-Or via the npm script:
+Or via the npm script from the `js/` folder:
 
 ```bash
+cd js
 npm run demo
 ```
 
-The demo imports directly from `src/roution.js`:
+The demo imports directly from `js/src/roution.js`:
 
 ```javascript
 import { createMatcher } from "../src/roution.js";
@@ -175,7 +193,7 @@ const result = matcher.match("/articles/javascript?page=1");
 
 ## Route Definitions
 
-Routes are defined as an object where each property key is a route pattern and each property value is application-defined data.
+Routes are defined as a map where each key is a route pattern and each value is application-defined data. The exact syntax depends on the language (an object literal in JavaScript, a `map` in Go, an associative array in PHP), but the pattern grammar is identical across implementations.
 
 ```javascript
 const routes = {
@@ -209,20 +227,7 @@ ROUTION does not assume that a value represents:
 * middleware
 * or any other specific type
 
-A route value may be any JavaScript value, including:
-
-* String
-* Number
-* Boolean
-* Object
-* Array
-* Function
-* Async Function
-* Class
-* Promise
-* Component
-* Symbol
-* Custom data structure
+A route value may be any value supported by the host language, including strings, numbers, booleans, objects, arrays, functions, classes, or custom data structures.
 
 ROUTION never executes, renders, imports, instantiates, awaits, or interprets the value.
 
@@ -354,7 +359,7 @@ This normalization happens automatically before route matching.
 
 ## Matching Result
 
-A successful match returns a structured object.
+A successful match returns a structured result (the concrete shape is expressed in the host language, but the fields are the same everywhere).
 
 ```javascript
 {
@@ -384,8 +389,7 @@ If no route matches, `found` is `false`.
 
 ## Query Parameters
 
-In addition to `pathname` normalization, ROUTION parses the query string and
-exposes it as the `query` property of the matching result.
+In addition to `pathname` normalization, ROUTION parses the query string and exposes it as the `query` property of the matching result.
 
 Query values follow standard HTTP semantics:
 
@@ -416,7 +420,7 @@ Returns:
 }
 ```
 
-When there is no query string, `query` is an empty object.
+When there is no query string, `query` is an empty object/map.
 
 ## Matching Strategy
 
@@ -426,7 +430,7 @@ This decision is automatic, requires no configuration, and is considered an impl
 
 Regardless of the selected strategy, the public API and matching behavior remain the same.
 
-## API Overview
+## API Overview (JavaScript reference)
 
 ### `createMatcher()`
 
@@ -442,8 +446,7 @@ The resulting matcher can be reused throughout the lifetime of the application.
 
 ### `createMatcher(routes, options)`
 
-`createMatcher()` accepts an optional second argument to tune behavior. All
-options are optional and have safe defaults, so existing usage is unchanged.
+`createMatcher()` accepts an optional second argument to tune behavior. All options are optional and have safe defaults, so existing usage is unchanged.
 
 ```javascript
 const matcher = createMatcher(routes, {
@@ -471,6 +474,24 @@ The incoming pathname is automatically normalized before matching.
 
 The method returns a structured matching result.
 
+## Testing
+
+Each language folder ships its own test suite.
+
+### JavaScript
+
+```bash
+cd js
+npm test
+```
+
+### Go
+
+```bash
+cd go
+go test ./...
+```
+
 ## Design Goals
 
 ROUTION is intentionally small.
@@ -479,8 +500,7 @@ Its responsibility begins and ends with pathname resolution.
 
 It intentionally avoids:
 
-* Browser APIs
-* Node.js APIs
+* Language-specific standard libraries where avoidable
 * HTTP servers
 * Framework-specific APIs
 * Rendering systems
@@ -489,16 +509,17 @@ It intentionally avoids:
 * Middleware execution
 * Redirect handling
 
-As long as a JavaScript runtime supports standard ECMAScript Modules, ROUTION behaves consistently.
+As long as a runtime supports the implementation's standard module system, ROUTION behaves consistently.
 
 The same matcher can be reused across browsers, servers, edge runtimes, and test environments without modification.
 
 ## Future Roadmap
 
-The project aims to remain small and stable while improving the developer experience.
+The project aims to remain small and stable while improving the developer experience and expanding language coverage.
 
 Potential future improvements include:
 
+* Additional language implementations (PHP and others)
 * TypeScript type definitions
 * Improved type inference
 * Additional route pattern capabilities
