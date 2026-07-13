@@ -40,7 +40,7 @@ ROUTION is implemented per language, each as a self-contained module inside its 
 | Language   | Path    | Status      | Notes                                                      |
 | ---------- | ------- | ----------- | ---------------------------------------------------------- |
 | JavaScript | `js/`   | Stable      | Reference implementation (ESM, zero dependencies).         |
-| Go         | `go/`   | In progress | `normalize` and `pattern` are implemented with tests.      |
+| Go         | `go/`   | Stable      | Full implementation (compile, regex/trie strategies, options). |
 | PHP        | `php/`  | Planned     | Not started yet.                                           |
 
 Each language folder is independent: it ships its own source, tests, and (where applicable) examples, and has no dependency on the other folders.
@@ -164,6 +164,32 @@ Returns:
 }
 ```
 
+### Go
+
+```go
+package main
+
+import (
+	roution "github.com/dimaspandu/roution"
+)
+
+func main() {
+	routes := map[string]any{
+		"/":               "public/index.html",
+		"/articles/:slug": "public/articles/[slug].html",
+		"*":               "public/404.html",
+	}
+
+	matcher := roution.CreateMatcher(routes)
+
+	result := matcher.Match("/articles/javascript?page=1")
+	_ = result
+}
+```
+
+The result mirrors the JavaScript shape: `Found`, `Pathname`, `Route`, `Params`
+(`map[string]string`), `Query` (`map[string]any`), and `Value` (`any`).
+
 ## Demo
 
 A runnable JavaScript sample is available in `js/examples/`. It defines a varied route collection (static, dynamic, multi-parameter, wildcard, arrays, objects, functions) and prints the matching result for several pathnames, including paths that fall through to the wildcard route.
@@ -189,6 +215,16 @@ import { createMatcher } from "../src/roution.js";
 const matcher = createMatcher(routes);
 
 const result = matcher.match("/articles/javascript?page=1");
+```
+
+### Go
+
+A runnable Go sample is available in `go/examples/basic/`. It builds the same
+varied route collection and prints the matching result for several pathnames.
+
+```bash
+cd go
+go run ./examples/basic
 ```
 
 ## Route Definitions

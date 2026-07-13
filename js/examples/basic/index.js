@@ -1,4 +1,4 @@
-import { createMatcher } from "../src/roution.js";
+import { createMatcher } from "../../src/roution.js";
 
 const routes = {
   "/": "public/index.html",
