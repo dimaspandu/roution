@@ -37,11 +37,12 @@ The same matching behavior is shared across every language implementation, so th
 
 ROUTION is implemented per language, each as a self-contained module inside its own folder. The JavaScript implementation is the reference; other languages follow the same specification and matching behavior.
 
-| Language   | Path    | Status      | Notes                                                      |
-| ---------- | ------- | ----------- | ---------------------------------------------------------- |
-| JavaScript | `js/`   | Stable      | Reference implementation (ESM, zero dependencies).         |
-| Go         | `go/`   | Stable      | Full implementation (compile, regex/trie strategies, options). |
-| PHP        | `php/`  | Planned     | Not started yet.                                           |
+| Language   | Path      | Status      | Notes                                                      |
+| ---------- | --------- | ----------- | ---------------------------------------------------------- |
+| JavaScript | `js/`     | Stable      | Reference implementation (ESM, zero dependencies).         |
+| Go         | `go/`     | Stable      | Full implementation (compile, regex/trie strategies, options). |
+| Python     | `python/` | Stable      | Full implementation (stdlib `unittest` tests, zero dependencies). |
+| PHP        | `php/`    | Planned     | Not started yet.                                           |
 
 Each language folder is independent: it ships its own source, tests, and (where applicable) examples, and has no dependency on the other folders.
 
@@ -57,9 +58,25 @@ roution/
   go/                 # Go implementation (in progress)
     normalize.go      # pathname normalization + query parsing
     pattern.go        # route pattern parsing
-    internal/         # matcher strategies (regex, trie) - in progress
-    examples/         # runnable example (in progress)
+    compile.go        # route compilation
+    matcher.go        # public API (CreateMatcher, Options)
+    strategy.go       # strategy selection
+    regex.go          # regex strategy
+    trie.go           # trie strategy
+    examples/basic/   # runnable example
     *_test.go         # unit tests
+  python/             # Python implementation (stable)
+    roution/          # Python package
+      normalize.py
+      pattern.py
+      compile.py
+      matcher.py      # public API (create_matcher, Options)
+      strategy.py     # strategy selection
+      result.py       # result builder
+      strategies/      # regex.py, trie.py
+    tests/            # unittest suite
+    examples/basic/   # runnable example
+    pyproject.toml
   README.md
   LICENSE
   CHANGELOG.md
@@ -190,6 +207,26 @@ func main() {
 The result mirrors the JavaScript shape: `Found`, `Pathname`, `Route`, `Params`
 (`map[string]string`), `Query` (`map[string]any`), and `Value` (`any`).
 
+### Python
+
+```python
+from roution import create_matcher
+
+routes = {
+    "/": "/public/index.html",
+    "/articles/:slug": "/public/articles/[slug].html",
+    "*": "/public/404.html",
+}
+
+matcher = create_matcher(routes)
+
+result = matcher.match("/articles/javascript?page=1")
+```
+
+The result mirrors the JavaScript shape and is returned as a `dict` with the
+keys `found`, `pathname`, `route`, `params` (`dict[str, str]`), `query`
+(`dict[str, str | list[str]]`), and `value` (`any`).
+
 ## Demo
 
 A runnable JavaScript sample is available in `js/examples/`. It defines a varied route collection (static, dynamic, multi-parameter, wildcard, arrays, objects, functions) and prints the matching result for several pathnames, including paths that fall through to the wildcard route.
@@ -225,6 +262,17 @@ varied route collection and prints the matching result for several pathnames.
 ```bash
 cd go
 go run ./examples/basic
+```
+
+### Python
+
+A runnable Python sample is available in `python/examples/basic/`. It builds the
+same varied route collection and prints the matching result for several
+pathnames.
+
+```bash
+cd python
+python -m examples.basic.main
 ```
 
 ## Route Definitions
@@ -526,6 +574,13 @@ npm test
 ```bash
 cd go
 go test ./...
+```
+
+### Python
+
+```bash
+cd python
+python -m unittest discover -s tests -t .
 ```
 
 ## Design Goals
