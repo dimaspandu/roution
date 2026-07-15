@@ -53,9 +53,9 @@ roution/
   js/                 # JavaScript (ESM) reference implementation
     src/              # engine source
     tests/            # unit tests (node:test)
-    examples/         # runnable example
+    demo/             # runnable demo
     package.json
-  go/                 # Go implementation (in progress)
+  go/                 # Go implementation (stable)
     normalize.go      # pathname normalization + query parsing
     pattern.go        # route pattern parsing
     compile.go        # route compilation
@@ -63,7 +63,7 @@ roution/
     strategy.go       # strategy selection
     regex.go          # regex strategy
     trie.go           # trie strategy
-    examples/basic/   # runnable example
+    demo/             # runnable demo
     *_test.go         # unit tests
   python/             # Python implementation (stable)
     roution/          # Python package
@@ -75,7 +75,7 @@ roution/
       result.py       # result builder
       strategies/      # regex.py, trie.py
     tests/            # unittest suite
-    examples/basic/   # runnable example
+    demo/             # runnable demo
     pyproject.toml
   README.md
   LICENSE
@@ -229,12 +229,14 @@ keys `found`, `pathname`, `route`, `params` (`dict[str, str]`), `query`
 
 ## Demo
 
-A runnable JavaScript sample is available in `js/examples/`. It defines a varied route collection (static, dynamic, multi-parameter, wildcard, arrays, objects, functions) and prints the matching result for several pathnames, including paths that fall through to the wildcard route.
+### JavaScript
+
+A runnable JavaScript sample is available in `js/demo/`. It defines a varied route collection (static, dynamic, multi-parameter, arrays, objects, functions) and runs the same pathnames through two matchers: one **without** a wildcard and one **with** a wildcard. This makes the difference easy to observe: unmatched pathnames resolve to `found: false` without a wildcard, and to `found: true` with the wildcard value (for example `public/404.html`) when one is defined.
 
 Run it with Node.js (no install step required):
 
 ```bash
-node js/examples/index.js
+node js/demo/index.js
 ```
 
 Or via the npm script from the `js/` folder:
@@ -256,23 +258,22 @@ const result = matcher.match("/articles/javascript?page=1");
 
 ### Go
 
-A runnable Go sample is available in `go/examples/basic/`. It builds the same
-varied route collection and prints the matching result for several pathnames.
+A runnable Go sample is available in `go/demo/`. It builds the same varied route
+collection and prints the matching result for several pathnames.
 
 ```bash
 cd go
-go run ./examples/basic
+go run ./demo
 ```
 
 ### Python
 
-A runnable Python sample is available in `python/examples/basic/`. It builds the
-same varied route collection and prints the matching result for several
-pathnames.
+A runnable Python sample is available in `python/demo/`. It builds the same
+varied route collection and prints the matching result for several pathnames.
 
 ```bash
 cd python
-python -m examples.basic.main
+python -m demo.main
 ```
 
 ## Route Definitions
@@ -470,6 +471,31 @@ A successful match returns a structured result (the concrete shape is expressed 
 | `value`    | The original value associated with the route        |
 
 If no route matches, `found` is `false`.
+
+## Wildcard Fallback
+
+The wildcard route (`*`) is optional and controls how unmatched pathnames are
+resolved.
+
+* **Without a wildcard**, a pathname that matches no route resolves to
+  `found: false`, `route: null`, and `value: null`.
+* **With a wildcard**, the same pathname resolves to `found: true`,
+  `route: "*"`, and the wildcard's value (for example `public/404.html`).
+
+```javascript
+// Without wildcard
+createMatcher({ "/": "home" }).match("/missing");
+// -> { found: false, route: null, value: null, ... }
+
+// With wildcard
+createMatcher({ "/": "home", "*": "public/404.html" }).match("/missing");
+// -> { found: true, route: "*", value: "public/404.html", ... }
+```
+
+ROUTION does not assign meaning to the wildcard value. Whether it is treated as
+a "not found" page, an SPA fallback that serves `index.html`, or anything else
+is left to the application. The `js/demo/` sample runs both scenarios side by
+side so the difference is easy to see.
 
 ## Query Parameters
 
