@@ -1,2 +1,2 @@
 <?php
-echo 'Hello, World!';
+echo 'Waiting for the next sprint!';

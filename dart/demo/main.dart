@@ -1,3 +1,3 @@
 void main() {
-  print('Hello, World!');
+  print('Waiting for the next sprint!');
 }
