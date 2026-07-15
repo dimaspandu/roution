@@ -40,9 +40,11 @@ ROUTION is implemented per language, each as a self-contained module inside its 
 | Language   | Path      | Status      | Notes                                                      |
 | ---------- | --------- | ----------- | ---------------------------------------------------------- |
 | JavaScript | `js/`     | Stable      | Reference implementation (ESM, zero dependencies).         |
-| Go         | `go/`     | Stable      | Full implementation (compile, regex/trie strategies, options). |
-| Python     | `python/` | Stable      | Full implementation (stdlib `unittest` tests, zero dependencies). |
-| PHP        | `php/`    | Planned     | Not started yet.                                           |
+| Go         | `go/`     | Stable      | Full implementation (compile, regex/trie strategies, options). Module path `github.com/dimaspandu/roution`. |
+| Python     | `python/` | Stable      | Full implementation (stdlib `unittest` tests, zero dependencies). Package name `roution`. |
+| Dart       | `dart/`   | Planned     | Scaffold only; not implemented yet.                        |
+| PHP        | `php/`    | Planned     | Scaffold only; not implemented yet.                        |
+| Rust       | `rust/`   | Planned     | Scaffold only; not implemented yet.                        |
 
 Each language folder is independent: it ships its own source, tests, and (where applicable) examples, and has no dependency on the other folders.
 
@@ -268,12 +270,13 @@ go run ./demo
 
 ### Python
 
-A runnable Python sample is available in `python/demo/`. It builds the same
-varied route collection and prints the matching result for several pathnames.
+A runnable Python sample is available in `python/examples/basic/`. It builds the
+same varied route collection and prints the matching result for several
+pathnames.
 
 ```bash
 cd python
-python -m demo.main
+python examples/basic/main.py
 ```
 
 ## Route Definitions

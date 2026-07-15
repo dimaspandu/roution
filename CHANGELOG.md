@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-07-15
+
+### Added
+
+- First stable Go implementation under `go/`, matching the JavaScript engine:
+  - Public API `CreateMatcher(routes, ...Options)` returning a matcher with
+    `Match(pathname)` (`matchResult` with `Found`, `Pathname`, `Route`,
+    `Params`, `Query`, `Value`).
+  - Options: `Query` (bool, default `true`), `Strategy` (`auto`/`regex`/`trie`,
+    default `auto`), `DynamicThreshold` (int, default `50`).
+  - Compile/regex/trie strategy layers plus `normalize`, `pattern`, and
+    automatic strategy selection (`DynamicThreshold`).
+  - Zero third-party dependencies (standard library only); module path
+    `github.com/dimaspandu/roution`.
+  - Runnable demo under `go/demo/` and unit tests via `go test ./...`.
+- First stable Python implementation under `python/`, matching the JavaScript
+  engine:
+  - Public API `create_matcher(routes, options)` returning a matcher with
+    `match(pathname)` (`MatchResult` dataclass with `found`, `pathname`,
+    `route`, `params`, `query`, `value`).
+  - Options: `query` (bool, default `True`), `strategy` (`auto`/`regex`/`trie`,
+    default `auto`), `dynamic_threshold` (int, default `50`).
+  - Compile/regex/trie strategy layers plus `normalize`, `pattern`, and
+    automatic strategy selection (`DYNAMIC_ROUTE_THRESHOLD`).
+  - Zero third-party dependencies (standard library only); package `roution`.
+  - Runnable demo under `python/examples/basic/` and unit tests via
+    `python -m unittest discover -s tests`.
+- Per-language READMEs (`go/README.md`, `python/README.md`) documenting
+  installation, quick start, API, demo, and testing in English.
+- `.gitignore` files for `go/` (build artifacts) and `python/` (bytecode,
+  virtual environments, build outputs).
+- Language placeholders (Dart, PHP, Rust) scaffolded with a "waiting for the
+  next sprint" note; not implemented yet.
+- Updated root `README.md` language table and `CHANGELOG.md` to reflect the
+  multi-language status.
+
 ## [1.0.2] - 2026-07-10
 
 ### Added
